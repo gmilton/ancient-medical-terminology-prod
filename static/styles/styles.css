@@ -53,7 +53,7 @@ h1 {
   font-size: 250%;
 }
 
-/*a:link {
+a:link {
   color: #234567;
   background-color: transparent;
   text-decoration: none;
@@ -85,7 +85,7 @@ a:active {
   width: 100%;
 }
 
-li {
+/*li {
   float: left;
 }
 
