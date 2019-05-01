@@ -13,7 +13,7 @@ input[type=text] {
   transition: width 0.4s ease-in-out;
 }
 
-#test {
+form.example button {
   /*float: right;*/
   width: 20%;
   padding: 10px;
@@ -25,11 +25,11 @@ input[type=text] {
   cursor: pointer;
 }
 
-#test:hover {
+form.example button:hover {
   background: #0b7dda;
 }
 
-#test::after {
+form.example::after {
   content: "";
   clear: both;
   display: table;
