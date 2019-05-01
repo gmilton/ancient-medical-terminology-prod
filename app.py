@@ -13,7 +13,7 @@ def json():
     return render_template('json.html')
 
 #background process happening without any refreshing
-@app.route('/background_process_test')
-def background_process_test():
-    print "Hello"
-    return "nothing"
+#@app.route('/background_process_test')
+#def background_process_test():
+#    print "Hello"
+#    return "nothing"
