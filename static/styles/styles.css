@@ -85,7 +85,7 @@ a:active {
   width: 100%;
 }
 
-/*li {
+li {
   float: left;
 }
 
@@ -105,7 +105,7 @@ li a:hover:not(.active) {
   background-color: #333;
 }
 
-#giles_button {
+/*#giles_button {
   border-radius: 25px;
   background-color: white;
   color: black;
