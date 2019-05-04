@@ -10,10 +10,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
-<!-- FIX ALERT -->
 <body="home">
+  <ul id="nav">
+<!--    <li><a class="active" href="index.html#home">Home</a></li>-->
+    <li style="float:left"><a href="#" class="alpha alpha-a" value="a">A</a></li>
+    <li style="float:left"><a href="#" class="alpha alpha-a" value="b">B</a></li>
+    <li style="float:left"><a href="#" class="alpha alpha-a" value="c">C</a></li>
+    <li style="float:left"><a href="#" class="alpha alpha-a" value="d">D</a></li>
+    <li style="float:left"><a href="#" class="alpha alpha-a" value="e">E</a></li>
+    <li style="float:left"><a href="#" class="alpha alpha-a" value="f">F</a></li>
+    <li style="float:left"><a href="#" class="alpha alpha-a" value="g">G</a></li>
+    <li style="float:left"><a href="#" class="alpha alpha-a" value="h">H</a></li>
+    <li style="float:left"><a href="#" class="alpha alpha-a" value="i">I</a></li>
+    <li style="float:left"><a href="#" class="alpha alpha-a" value="j">J</a></li>
+    <li style="float:left"><a href="#" class="alpha alpha-a" value="k">K</a></li>
+    <li style="float:left"><a href="#" class="alpha alpha-a" value="l">L</a></li>
+    <li style="float:left"><a href="#" class="alpha alpha-a" value="m">M</a></li>
+    <li style="float:left"><a href="#" class="alpha alpha-a" value="n">N</a></li>
+    <li style="float:left"><a href="#" class="alpha alpha-a" value="o">O</a></li>
+    <li style="float:left"><a href="#" class="alpha alpha-a" value="p">P</a></li>
+    <li style="float:left"><a href="#" class="alpha alpha-a" value="q">Q</a></li>
+    <li style="float:left"><a href="#" class="alpha alpha-a" value="r">R</a></li>
+    <li style="float:left"><a href="#" class="alpha alpha-a" value="s">S</a></li>
+    <li style="float:left"><a href="#" class="alpha alpha-a" value="t">T</a></li>
+    <li style="float:left"><a href="#" class="alpha alpha-a" value="u">U</a></li>
+    <li style="float:left"><a href="#" class="alpha alpha-a" value="v">V</a></li>
+    <li style="float:left"><a href="#" class="alpha alpha-a" value="w">W</a></li>
+    <li style="float:left"><a href="#" class="alpha alpha-a" value="x">X</a></li>
+    <li style="float:left"><a href="#" class="alpha alpha-a" value="y">Y</a></li>
+    <li style="float:left"><a href="#" class="alpha alpha-a" value="z">Z</a></li>
+  </ul>
   <br><br>
-  <!--<header><img id="profile_photo" src="scotland.jpg" alt="scotland.jpg"></a></header>-->
   <h1 id="name"><abbr title="G$">Greek and Latin Medical Terminology 'R' Us</abbr></h1>
   <p>Find a term, find a meaning, or parse through medical lingo.</p>
   <br>
@@ -74,7 +101,7 @@ addEventListener("DOMContentLoaded", function() {
       e.preventDefault();
 
       var clickedButton = e.target;
-      var search = clickedButton.value;
+      var search = "search;" + clickedButton.value;
       search += ";"
       search += document.getElementById("search_bar").value
       console.log(document.getElementById("search_bar").name)
@@ -112,5 +139,53 @@ addEventListener("DOMContentLoaded", function() {
     });
   }
 }, true);
+
+// Only run what comes next *after* the page has loaded
+addEventListener("DOMContentLoaded", function() {
+  // Grab all of the elements with a class of command
+  // (which all of the buttons we just created have)
+  var alphabet = document.querySelectorAll("a");
+  console.log(alphabet.length)
+  for (var i=0, l=alphabet.length; i<l; i++) {
+    var letter = alphabet[i];
+    // For each button, listen for the "click" event
+    letter.addEventListener("click", function(e) {
+      // When a click happens, stop the button
+      // from submitting our form (if we have one)
+      e.preventDefault();
+
+      var clickedLetter = e.target;
+      var prefix = "prefix;" + clickedLetter.innerHTML;
+
+      // Now we need to send the data to our server
+      // without reloading the page - this is the domain of
+      // AJAX (Asynchronous JavaScript And XML)
+      // We will create a new request object
+      // and set up a handler for the response
+      var request = new XMLHttpRequest();
+      request.onload = function() {
+          prev_results = document.getElementById("results");
+          while (prev_results.firstChild) {
+             prev_results.removeChild(prev_results.firstChild);
+          }
+          // We could do more interesting things with the response
+          // or, we could ignore it entirely
+          termdata = JSON.parse(request.responseText);
+          var terms = termdata['terms'];
+          for (i = 0; i < terms.length; i++) {
+              var termLabel = new Label();
+              termLabel.createLabel(terms[i]['term']+" - "+terms[i]['definition']+" - "+terms[i]['greek_latin']+" - "+terms[i]['pos'], terms[i]['term']+"Label", "p");
+              termLabel.addToDocument();
+          }
+          //alert(request.responseText);
+      };
+      // We point the request at the appropriate command
+      request.open("GET", "/" + prefix, true);
+      // and then we send it off
+      request.send();
+    });
+  }
+}, true);
+
 </script>
 </html>

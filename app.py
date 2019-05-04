@@ -39,6 +39,20 @@ def search_defs(word_list, search):
 
     return sorted(new_word_list, key=lambda w: w['term'])
 
+def find_prefix(word_list, prefix):
+    new_word_list = []
+
+    for word in word_list:
+        if word.term.lower().startswith(prefix.lower()):
+            entry = {}
+            entry['term'] = word.term
+            entry['definition'] = word.definition
+            entry['greek_latin'] = word.greek_latin
+            entry['pos'] = word.pos
+            new_word_list.append(entry)
+
+    return sorted(new_word_list, key=lambda w: w['term'])
+
 @app.route('/')
 def hello():
     return render_template('index.html', commands=AVAILABLE_COMMANDS)
@@ -51,24 +65,28 @@ def hello():
 @app.route('/<cmd>')
 def command(cmd=None):
     cmd = cmd.split(";")
-    if cmd[0] == TERMS:
-       if cmd[1]:
-           search = cmd[1]
-           CONTAINS = cmd[1]
-       else:
-           search = "NULL"
-       terms_list = search_terms(WORD_LIST, search)
-       response = {}
-       response['terms'] = terms_list
-       #response = "Searching {} for {}: {}".format(cmd[0].capitalize(), search, terms_list)
-    elif cmd[0] == DEFS:
-       if cmd[1]:
-           search = cmd[1]
-       else:
-           search = "NULL"
-       terms_list = search_defs(WORD_LIST, search)
-       response = {}
-       response['terms'] = terms_list
+    if cmd[0] == "search":
+        if cmd[1] == TERMS:
+            if cmd[2]:
+                search = cmd[2]
+            else:
+                search = "NULL"
+            terms_list = search_terms(WORD_LIST, search)
+            response = {}
+            response['terms'] = terms_list
+        elif cmd[1] == DEFS:
+            if cmd[2]:
+                search = cmd[2]
+            else:
+                search = "NULL"
+            terms_list = search_defs(WORD_LIST, search)
+            response = {}
+            response['terms'] = terms_list
+    elif cmd[0] == "prefix":
+        prefix = cmd[1]
+        terms_list = find_prefix(WORD_LIST, prefix)
+        response = {}
+        response['terms'] = terms_list
     else:
         response = 'No search done'
     return jsonify(response), 200, {'Content-Type': 'application/json'}
