@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 from words import load_words, Word, Node, Tree
 app = Flask(__name__)
 
@@ -15,9 +15,29 @@ def search_terms(word_list, search):
     for word in word_list:
         if search.lower() in word.term.lower():
             print(search.lower(), word.term.lower())
-            new_word_list.append(word)
+            entry = {}
+            entry['term'] = word.term
+            entry['definition'] = word.definition
+            entry['greek_latin'] = word.greek_latin
+            entry['pos'] = word.pos
+            new_word_list.append(entry)
 
-    return sorted(new_word_list, key=lambda w: w.term)
+    return sorted(new_word_list, key=lambda w: w['term'])
+
+def search_defs(word_list, search):
+    new_word_list = []
+
+    for word in word_list:
+        if search.lower() in word.definition.lower():
+            print(search.lower(), word.term.lower())
+            entry = {}
+            entry['term'] = word.term
+            entry['definition'] = word.definition
+            entry['greek_latin'] = word.greek_latin
+            entry['pos'] = word.pos
+            new_word_list.append(entry)
+
+    return sorted(new_word_list, key=lambda w: w['term'])
 
 @app.route('/')
 def hello():
@@ -32,22 +52,26 @@ def hello():
 def command(cmd=None):
     cmd = cmd.split(";")
     if cmd[0] == TERMS:
-       camera_command = "X"
-       f = open("word_lists.csv")
-       line = f.readline()
        if cmd[1]:
            search = cmd[1]
            CONTAINS = cmd[1]
        else:
            search = "NULL"
        terms_list = search_terms(WORD_LIST, search)
-       response = "Searching {} for {}: {}".format(cmd[0].capitalize(), search, terms_list)
+       response = {}
+       response['terms'] = terms_list
+       #response = "Searching {} for {}: {}".format(cmd[0].capitalize(), search, terms_list)
+    elif cmd[0] == DEFS:
+       if cmd[1]:
+           search = cmd[1]
+       else:
+           search = "NULL"
+       terms_list = search_defs(WORD_LIST, search)
+       response = {}
+       response['terms'] = terms_list
     else:
-        camera_command = cmd[0][0].upper()
-        response = "Searching {}".format(cmd[0].capitalize())
-
-    # ser.write(camera_command)
-    return response, 200, {'Content-Type': 'text/plain'}
+        response = 'No search done'
+    return jsonify(response), 200, {'Content-Type': 'application/json'}
 
 #background process happening without any refreshing
 #@app.route('/search_terms')
