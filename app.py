@@ -14,5 +14,5 @@ def json():
 #background process happening without any refreshing
 @app.route('/search_terms')
 def search_terms():
-    print "Hello"
+    print("Hello")
     return "nothing"
