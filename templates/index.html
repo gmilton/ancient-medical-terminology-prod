@@ -56,6 +56,7 @@
     <a href="/definitions" id="definitions"><button class='btn btn-definitions' value='definitions'>Search Definitions</button></a>-->
     <button class='btn btn-terms' value="terms">Search Terms</button>
     <button class='btn btn-definitions' value='definitions'>Search Definitions</button>
+    <button class='parse' value='parse'>Parse Term</button>
   </form>
   <div id="results"></div>
   <br><br><br>
@@ -233,6 +234,62 @@ addEventListener("DOMContentLoaded", function() {
       };
       // We point the request at the appropriate command
       request.open("GET", "/" + search, true);
+      // and then we send it off
+      request.send();
+    });
+  }
+}, true);
+
+// Only run what comes next *after* the page has loaded
+addEventListener("DOMContentLoaded", function() {
+  // Grab all of the elements with a class of command
+  // (which all of the buttons we just created have)
+  var parseButtons = document.querySelectorAll(".parse");
+  for (var i=0, l=parseButtons.length; i<l; i++) {
+    var parse_term = parseButtons[i];
+    // For each button, listen for the "click" event
+    parse_term.addEventListener("click", function(e) {
+      // When a click happens, stop the button
+      // from submitting our form (if we have one)
+      e.preventDefault();
+
+      var clickedParse = e.target;
+      var parse = "parse;" + document.getElementById("search_bar").value;
+
+      // Now we need to send the data to our server
+      // without reloading the page - this is the domain of
+      // AJAX (Asynchronous JavaScript And XML)
+      // We will create a new request object
+      // and set up a handler for the response
+      var request = new XMLHttpRequest();
+      request.onload = function() {
+          prev_results = document.getElementById("results");
+          while (prev_results.firstChild) {
+             prev_results.removeChild(prev_results.firstChild);
+          }
+          // We could do more interesting things with the response
+          // or, we could ignore it entirely
+          termdata = JSON.parse(request.responseText);
+          var firstLabel = new Label();
+          firstLabel.createLabel("TERM:  "+document.getElementById("search_bar").value, "firstLabel", "h2");
+          firstLabel.addToDocument();
+          var terms = termdata['terms'];
+          var parses = termdata['parses'];
+          for (i = 0; i < terms.length; i++) {
+              var termLabel = new Label();
+              termLabel.createLabel(terms[i]['term']+" - "+terms[i]['definition']+" - "+terms[i]['greek_latin']+" - "+terms[i]['pos'], terms[i]['term']+"Label", "p");
+              termLabel.addToDocument();
+          }
+          for (i = 0; i < parses.length; i++) {
+              var parseLabel = new Label();
+              parseLabel.createLabel(parses[i], "parseLabel"+i.toString(), "p");
+              parseLabel.addToDocument();
+          }
+          console.log(parses);
+          //alert(request.responseText);
+      };
+      // We point the request at the appropriate command
+      request.open("GET", "/" + parse, true);
       // and then we send it off
       request.send();
     });

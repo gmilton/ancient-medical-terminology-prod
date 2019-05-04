@@ -1,5 +1,6 @@
 from flask import Flask, render_template, jsonify
 from words import load_words, Word, Node, Tree
+import collections
 app = Flask(__name__)
 
 TERMS, DEFS = "terms", "definitions"
@@ -65,6 +66,56 @@ def find_pos(word_list, pos):
 
     return sorted(new_word_list, key=lambda w: w['term'])
 
+def find_all_wr(word_list, term):
+    wr_start_dict = collections.defaultdict(list)
+    word_roots = []
+    terms_list = []
+
+    for word in word_list:
+        if word.term.lower() in term:
+            i = term.find(word.term.lower())
+            wr_start_dict[i].append(word)
+            entry = {}
+            entry['term'] = word.term
+            entry['definition'] = word.definition
+            entry['greek_latin'] = word.greek_latin
+            entry['pos'] = word.pos
+            terms_list.append(entry)
+            word_roots.append(word)
+
+    return wr_start_dict, word_roots, terms_list
+
+def combine_wrs(wr_dict, wr_list, term):
+    possible_parses = []
+    i = list(sorted(wr_dict.keys()))[0]
+    for wr in wr_dict[i]:
+        node = Node(wr)
+        possible_parses.append(Tree(node))
+    for branch in possible_parses:
+        j = i
+        node = branch.root
+        frontier = [[node, j]]
+        while frontier:
+            node, j = frontier.pop(0)
+            k = j + len(node.word.term)
+            j = find_next_wr(wr_dict, term, k)
+            while j and j < len(term):
+                for wr in wr_dict[j]:
+                    child = Node(wr)
+                    node.children.append(child)
+                    frontier.append([child, j])
+                j += 1
+    for p in possible_parses:
+        print(p.root)
+    return possible_parses
+
+def find_next_wr(wr_dict, term, i):
+    while i not in wr_dict and i < len(term):
+        i += 1
+    if i >= len(term):
+        return None
+    return i
+
 @app.route('/')
 def hello():
     return render_template('index.html', commands=AVAILABLE_COMMANDS)
@@ -104,6 +155,16 @@ def command(cmd=None):
         terms_list = find_pos(WORD_LIST, pos)
         response = {}
         response['terms'] = terms_list
+    elif cmd[0] == 'parse':
+        parse = cmd[1]
+        wr_dict, wr_list, terms_list = find_all_wr(WORD_LIST, parse)
+        possible_parses = combine_wrs(wr_dict, wr_list, parse)
+        response = {}
+        response['terms'] = terms_list
+        parses_list = []
+        for p in possible_parses:
+            parses_list.append(p.root.__str__())
+        response['parses'] = parses_list
     else:
         response = 'No search done'
     return jsonify(response), 200, {'Content-Type': 'application/json'}
