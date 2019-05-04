@@ -7,12 +7,12 @@ def hello():
     return render_template('index.html')
 
 #rendering the HTML page which has the button
-@app.route('/json')
+@app.route('/terms')
 def json():
-    return render_template('json.html')
+    return render_template('terms.html')
 
 #background process happening without any refreshing
-#@app.route('/search_terms')
-#def search_terms():
-#    print "Hello"
-#    return "nothing"
+@app.route('/search_terms')
+def search_terms():
+    print "Hello"
+    return "nothing"
