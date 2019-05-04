@@ -12,7 +12,7 @@ input[type=text] {
   transition: width 0.4s ease-in-out;
 }
 
-.btn button {
+form.example button {
   /*float: right;*/
   width: 20%;
   padding: 10px;
@@ -24,23 +24,31 @@ input[type=text] {
   cursor: pointer;
 }
 
-.btn button:hover {
+form.example button:hover {
   background: #0b7dda;
 }
 
-.btn::after {
+form.example::after {
   content: "";
   clear: both;
   display: table;
 }
 
+html {
+    height: 100%;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    background-repeat:no-repeat;
+    background: linear-gradient(to bottom right, #345678, white) fixed;
+}
+
 body {
-  background: linear-gradient(to bottom right, #345678, white);
   color: #555555;
   text-align: center;
   font-family: 'Raleway', sans-serif;
   margin: 0;
-  height: 100%;
 }
 
 h1 {

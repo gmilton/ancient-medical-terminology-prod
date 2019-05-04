@@ -3,7 +3,6 @@
 <head>
   <title>Ancient Medical Terminology</title>
   <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/styles.css') }}">
-  <script src="project.py"></script>
   <link href="https://fonts.googleapis.com/css?family=Lobster|Raleway" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <meta charset="UTF-8">
@@ -26,6 +25,8 @@
     <button class='btn btn-terms' value="terms">Search Terms</button>
     <button class='btn btn-definitions' value='definitions'>Search Definitions</button>
   </form>
+  <div id="results"></div>
+<!--  <br><br><br>
   <br><br><br>
   <br><br><br>
   <br><br><br>
@@ -36,10 +37,29 @@
   <br><br><br>
   <br><br><br>
   <br><br><br>
-  <br><br><br>
-  <br><br><br>
+  <br><br><br>-->
 </body>
+
 <script>
+
+function Label(){
+    this.item = null;
+    this.createLabel= function(text, id, type){
+        this.id = id;
+        var label = document.createElement(type);
+        label.setAttribute("id",id);
+        var textLabel = document.createTextNode(text);
+        label.appendChild(textLabel);
+        this.item = label;
+    }
+    this.setText = function(text){
+        this.item.innerHTML = text;
+    }
+    this.addToDocument = function(){
+        document.getElementById("results").appendChild(this.item);
+    }
+}
+
 // Only run what comes next *after* the page has loaded
 addEventListener("DOMContentLoaded", function() {
   // Grab all of the elements with a class of command
@@ -67,12 +87,23 @@ addEventListener("DOMContentLoaded", function() {
       // and set up a handler for the response
       var request = new XMLHttpRequest();
       request.onload = function() {
+          prev_results = document.getElementById("results");
+          while (prev_results.firstChild) {
+             prev_results.removeChild(prev_results.firstChild);
+          }
           // We could do more interesting things with the response
           // or, we could ignore it entirely
-          console.log(request.responseText)
-          console.log(document.getElementById("search_bar").name)
-          console.log(document.getElementById("search_bar").value)
-          alert(request.responseText);
+          console.log(request.responseText);
+          console.log(document.getElementById("search_bar").name);
+          console.log(document.getElementById("search_bar").value);
+          termdata = JSON.parse(request.responseText);
+          var terms = termdata['terms'];
+          for (i = 0; i < terms.length; i++) {
+              var termLabel = new Label();
+              termLabel.createLabel(terms[i]['term']+" - "+terms[i]['definition']+" - "+terms[i]['greek_latin']+" - "+terms[i]['pos'], terms[i]['term']+"Label", "p");
+              termLabel.addToDocument();
+          }
+          //alert(request.responseText);
       };
       // We point the request at the appropriate command
       request.open("GET", "/" + search, true);
