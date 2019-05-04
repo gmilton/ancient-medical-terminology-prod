@@ -282,7 +282,10 @@ addEventListener("DOMContentLoaded", function() {
           }
           for (i = 0; i < parses.length; i++) {
               var parseLabel = new Label();
-              parseLabel.createLabel(parses[i], "parseLabel"+i.toString(), "p");
+              nTabs = parseInt(parses[i][0]);
+              term = parses[i].slice(2, parses[i].length);
+              console.log(term);
+              parseLabel.createLabel("a"*nTabs + term, "parseLabel"+i.toString(), "p");
               parseLabel.addToDocument();
           }
           console.log(parses);

@@ -162,8 +162,33 @@ def command(cmd=None):
         response = {}
         response['terms'] = terms_list
         parses_list = []
+        parses_dict = {}
         for p in possible_parses:
             parses_list.append(p.root.__str__())
+        for p in parses_list:
+            parts = p.split(";")
+            parts.pop()
+            last_seen = []
+            last_level = -1
+            levels_seen = set()
+            #for elem in parts:
+                #level, elem = elem.split(":")
+                #elem = elem.replace("'", "")
+                #if level == 0:
+                    #parses_dict[elem] = {}
+                #elif level == last_level:
+                    
+                #elif level > last_level:
+                    #next_dict[elem] = {} 
+                #elif level < last_level:
+                    #
+                #last_level = level
+                #if level in levels_seen:
+                    #last_level[level] = elem
+                #else:
+                    #last_level.append(elem)
+                #levels_seen.add(level)
+            print(parts)
         response['parses'] = parses_list
     else:
         response = 'No search done'
