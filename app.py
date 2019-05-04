@@ -14,7 +14,6 @@ def search_terms(word_list, search):
 
     for word in word_list:
         if search.lower() in word.term.lower():
-            print(search.lower(), word.term.lower())
             entry = {}
             entry['term'] = word.term
             entry['definition'] = word.definition
@@ -29,7 +28,6 @@ def search_defs(word_list, search):
 
     for word in word_list:
         if search.lower() in word.definition.lower():
-            print(search.lower(), word.term.lower())
             entry = {}
             entry['term'] = word.term
             entry['definition'] = word.definition
@@ -44,6 +42,20 @@ def find_prefix(word_list, prefix):
 
     for word in word_list:
         if word.term.lower().startswith(prefix.lower()):
+            entry = {}
+            entry['term'] = word.term
+            entry['definition'] = word.definition
+            entry['greek_latin'] = word.greek_latin
+            entry['pos'] = word.pos
+            new_word_list.append(entry)
+
+    return sorted(new_word_list, key=lambda w: w['term'])
+
+def find_pos(word_list, pos):
+    new_word_list = []
+
+    for word in word_list:
+        if word.pos == pos:
             entry = {}
             entry['term'] = word.term
             entry['definition'] = word.definition
@@ -85,6 +97,11 @@ def command(cmd=None):
     elif cmd[0] == "prefix":
         prefix = cmd[1]
         terms_list = find_prefix(WORD_LIST, prefix)
+        response = {}
+        response['terms'] = terms_list
+    elif cmd[0] == "pos":
+        pos = cmd[1]
+        terms_list = find_pos(WORD_LIST, pos)
         response = {}
         response['terms'] = terms_list
     else:
