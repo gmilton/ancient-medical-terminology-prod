@@ -164,12 +164,16 @@ def command(cmd=None):
         parses_dict = {}
         stack = []
         response['roots'] = []
+        terms_seen = set()
         for p in possible_parses:
             stack.append(p.root)
             response['roots'].append(p.root.word.term)
             parses_dict[p.root.word.term] = []
         while stack:
             top = stack.pop()
+            if top.word.term in terms_seen:
+                continue
+            terms_seen.add(top.word.term) 
             for c in top.children:
                 if top.word.term not in parses_dict:
                     parses_dict[top.word.term] = []

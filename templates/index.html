@@ -59,6 +59,7 @@
     <button class='parse' value='parse'>Parse Term</button>
   </form>
   <div id="results"></div>
+  <div id="parses"></div>
   <br><br><br>
   <!--<br><br><br>
   <br><br><br>
@@ -113,13 +114,14 @@ function Div() {
         this.id = id;
         var div = document.createElement("div");
         div.setAttribute("id", id);
+        div.setAttribute("class", "parsediv");
         this.item = div;
     }
     this.setAttribute = function(attr, value) {
         this.item.setAttribute(attr, value);
     }
     this.addToDocument = function(){
-        document.body.appendChild(this.item);
+        document.getElementById("parses").appendChild(this.item);
     }
 }
 
@@ -325,6 +327,12 @@ addEventListener("DOMContentLoaded", function() {
           while (prev_results.firstChild) {
              prev_results.removeChild(prev_results.firstChild);
           }
+          var parseDivs = document.querySelectorAll(".parsediv");
+          console.log(parseDivs.length);
+          for (var j = 0, p=parseDivs.length; j<p; j++) {
+              var prevParseDiv = parseDivs[j];
+              prevParseDiv.parentNode.removeChild(prevParseDiv);
+          } 
           // We could do more interesting things with the response
           // or, we could ignore it entirely
           termdata = JSON.parse(request.responseText);
@@ -349,8 +357,6 @@ addEventListener("DOMContentLoaded", function() {
               while (stack.size() > 0) {
                   var term = stack.pop();
                   var term_children = parses[term['term']];
-                  console.log(parses[term['term']]);
-                  console.log(term);
                   try {
                       for (e = 0; e < term_children.length; e++) {
                           stack.push({"term":term_children[e]['child'], "level":term['level'] + 1});
@@ -360,26 +366,21 @@ addEventListener("DOMContentLoaded", function() {
                       var parseLabel = new Label();
                       var parseDiv = new Div();
                       var pixels = term['level']*100;
-                      parseDiv.createDiv("tabDiv"+term['level'].toString());
+                      parseDiv.createDiv("tabDiv"+root+term['level'].toString());
                       parseDiv.setAttribute("style", "margin-left:"+pixels.toString()+'px');
                       parseLabel.createLabel(term['term'], "parseLabel"+term['level'].toString(), "p");
                       parseDiv.addToDocument();
                       parseLabel.addToParse(parseDiv.id);
-                      console.log(term['term']);
-                      console.log(term['level']);
                       continue;
                   }       
                   var parseLabel = new Label();
                   var parseDiv = new Div();
                   var pixels = term['level']*100;
-                  parseDiv.createDiv("tabDiv"+term['level'].toString());
+                  parseDiv.createDiv("tabDiv"+root+term['level'].toString());
                   parseDiv.setAttribute("style", "margin-left:"+pixels.toString()+'px');
                   parseLabel.createLabel(term['term'], "parseLabel"+term['level'].toString(), "p");
-                  console.log(parseDiv.id);
                   parseDiv.addToDocument();
                   parseLabel.addToParse(parseDiv.id);
-                  console.log(term['term']);
-                  console.log(term['level']);
               }
           }
           //console.log(parses);
