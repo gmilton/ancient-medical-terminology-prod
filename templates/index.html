@@ -93,6 +93,36 @@ function Label(){
     }
 }
 
+// Creates a stack
+var Stack = function() {
+    this.count = 0;
+    this.storage = {};
+}
+
+// Adds a value onto the end of the stack
+Stack.prototype.push = function(value) {
+    this.storage[this.count] = value;
+    this.count++;
+}
+
+// Removes and returns the value at the end of the stack
+Stack.prototype.pop = function() {
+    // Check to see if the stack is empty
+    if (this.count === 0) {
+        return undefined;
+    }
+
+    this.count--;
+    var result = this.storage[this.count];
+    delete this.storage[this.count];
+    return result;
+}
+
+// Returns the length of the stack
+Stack.prototype.size = function() {
+    return this.count;
+}
+
 // Only run what comes next *after* the page has loaded
 addEventListener("DOMContentLoaded", function() {
   // Grab all of the elements with a class of command
@@ -151,7 +181,6 @@ addEventListener("DOMContentLoaded", function() {
   // Grab all of the elements with a class of command
   // (which all of the buttons we just created have)
   var alphabet = document.querySelectorAll(".alpha");
-  console.log(alphabet.length)
   for (var i=0, l=alphabet.length; i<l; i++) {
     var letter = alphabet[i];
     // For each button, listen for the "click" event
@@ -207,7 +236,6 @@ addEventListener("DOMContentLoaded", function() {
       e.preventDefault();
 
       var clickedPOS = e.target;
-      console.log(clickedPOS.innerHTML);
       var search = "pos;" + clickedPOS.innerHTML;
 
       // Now we need to send the data to our server
@@ -275,20 +303,42 @@ addEventListener("DOMContentLoaded", function() {
           firstLabel.addToDocument();
           var terms = termdata['terms'];
           var parses = termdata['parses'];
+          var roots = termdata['roots'];
           for (i = 0; i < terms.length; i++) {
               var termLabel = new Label();
               termLabel.createLabel(terms[i]['term']+" - "+terms[i]['definition']+" - "+terms[i]['greek_latin']+" - "+terms[i]['pos'], terms[i]['term']+"Label", "p");
               termLabel.addToDocument();
           }
-          for (i = 0; i < parses.length; i++) {
-              var parseLabel = new Label();
-              nTabs = parseInt(parses[i][0]);
-              term = parses[i].slice(2, parses[i].length);
-              console.log(term);
-              parseLabel.createLabel("a"*nTabs + term, "parseLabel"+i.toString(), "p");
-              parseLabel.addToDocument();
+          for (r = 0; r < roots.length; r++) {
+              root = roots[r];
+              var stack = new Stack();
+              stack.push({"term":root, "level":0});
+              while (stack.size() > 0) {
+                  var term = stack.pop();
+                  var term_children = parses[term['term']];
+                  console.log(parses[term['term']]);
+                  console.log(term);
+                  try {
+                      for (e = 0; e < term_children.length; e++) {
+                          stack.push({"term":term_children[e]['child'], "level":term['level'] + 1});
+                      }
+                  }
+                  catch(err) {
+                      var parseLabel = new Label();
+                      parseLabel.createLabel(term['term']+" - "+term['level'], term['term']+"ParseLabel"+term['level'].toString(), "p");
+                      parseLabel.addToDocument();
+                      console.log(term['term']);
+                      console.log(term['level']);
+                      continue;
+                  }       
+                  var parseLabel = new Label();
+                  parseLabel.createLabel(term['term']+" - "+term['level'], term['term']+"ParseLabel"+term['level'].toString(), "p");
+                  parseLabel.addToDocument();
+                  console.log(term['term']);
+                  console.log(term['level']);
+              }
           }
-          console.log(parses);
+          //console.log(parses);
           //alert(request.responseText);
       };
       // We point the request at the appropriate command
