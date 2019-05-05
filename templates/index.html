@@ -85,11 +85,41 @@ function Label(){
         label.appendChild(textLabel);
         this.item = label;
     }
+    this.setAttribute = function(attr, value) {
+        this.item.setAttribute(attr, value);
+    }
     this.setText = function(text){
         this.item.innerHTML = text;
     }
     this.addToDocument = function(){
         document.getElementById("results").appendChild(this.item);
+    }
+    this.addToParse = function(id){
+        document.getElementById(id).appendChild(this.item);
+    }
+}
+
+function HTMLBreak() {
+    this.item = document.createElement("br");
+    this.addToDocument = function(id) {
+        document.body.appendChild(this.item);
+    }
+}
+
+function Div() {
+    this.item = null;
+    this.id = null;
+    this.createDiv = function(id){
+        this.id = id;
+        var div = document.createElement("div");
+        div.setAttribute("id", id);
+        this.item = div;
+    }
+    this.setAttribute = function(attr, value) {
+        this.item.setAttribute(attr, value);
+    }
+    this.addToDocument = function(){
+        document.body.appendChild(this.item);
     }
 }
 
@@ -309,6 +339,9 @@ addEventListener("DOMContentLoaded", function() {
               termLabel.createLabel(terms[i]['term']+" - "+terms[i]['definition']+" - "+terms[i]['greek_latin']+" - "+terms[i]['pos'], terms[i]['term']+"Label", "p");
               termLabel.addToDocument();
           }
+          var secondLabel = new Label();
+          secondLabel.createLabel("Possible Ways to Parse:  "+document.getElementById("search_bar").value, "secondLabel", "h2");
+          secondLabel.addToDocument();
           for (r = 0; r < roots.length; r++) {
               root = roots[r];
               var stack = new Stack();
@@ -325,21 +358,34 @@ addEventListener("DOMContentLoaded", function() {
                   }
                   catch(err) {
                       var parseLabel = new Label();
-                      parseLabel.createLabel(term['term']+" - "+term['level'], term['term']+"ParseLabel"+term['level'].toString(), "p");
-                      parseLabel.addToDocument();
+                      var parseDiv = new Div();
+                      var pixels = term['level']*100;
+                      parseDiv.createDiv("tabDiv"+term['level'].toString());
+                      parseDiv.setAttribute("style", "margin-left:"+pixels.toString()+'px');
+                      parseLabel.createLabel(term['term'], "parseLabel"+term['level'].toString(), "p");
+                      parseDiv.addToDocument();
+                      parseLabel.addToParse(parseDiv.id);
                       console.log(term['term']);
                       console.log(term['level']);
                       continue;
                   }       
                   var parseLabel = new Label();
-                  parseLabel.createLabel(term['term']+" - "+term['level'], term['term']+"ParseLabel"+term['level'].toString(), "p");
-                  parseLabel.addToDocument();
+                  var parseDiv = new Div();
+                  var pixels = term['level']*100;
+                  parseDiv.createDiv("tabDiv"+term['level'].toString());
+                  parseDiv.setAttribute("style", "margin-left:"+pixels.toString()+'px');
+                  parseLabel.createLabel(term['term'], "parseLabel"+term['level'].toString(), "p");
+                  console.log(parseDiv.id);
+                  parseDiv.addToDocument();
+                  parseLabel.addToParse(parseDiv.id);
                   console.log(term['term']);
                   console.log(term['level']);
               }
           }
           //console.log(parses);
           //alert(request.responseText);
+          var br = new HTMLBreak();
+          br.addToDocument(parseDiv.id);
       };
       // We point the request at the appropriate command
       request.open("GET", "/" + parse, true);
